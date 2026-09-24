@@ -3,8 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IPV6learn — Procvičování a Test</title>
-  <meta name="description" content="IPV6learn — procvičování a test zkracování IPv6 adres" />
+  <title>IPV6learn — výuka IPv6</title>
+  <meta name="description" content="IPV6learn — hub pro zkracování, subnetting, speciální adresy a teorii IPv6" />
+  <meta name="color-scheme" content="light dark" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("ipv6learn-theme");
+        if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+        else if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+          document.documentElement.setAttribute("data-theme", "dark");
+        else document.documentElement.setAttribute("data-theme", "light");
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,52 +30,307 @@
       <span class="brand-mark" aria-hidden="true">::</span>
       <span class="brand-name">IPV6learn</span>
     </button>
-    <nav class="mode-nav" role="tablist" aria-label="Režim">
-      <button type="button" class="mode-btn is-active" data-mode="practice" role="tab" aria-selected="true">Procvičování</button>
-      <button type="button" class="mode-btn" data-mode="test" role="tab" aria-selected="false">Test (10)</button>
-    </nav>
+    <div class="header-right">
+      <p class="header-crumb" id="header-crumb" hidden></p>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Přepnout světlý / tmavý režim" title="Světlý / tmavý režim">
+        <span class="theme-icon theme-icon-sun" aria-hidden="true"></span>
+        <span class="theme-icon theme-icon-moon" aria-hidden="true"></span>
+      </button>
+    </div>
   </header>
 
   <main>
     <section id="view-home" class="view is-visible">
-      <div class="hero">
-        <h1 class="hero-brand">IPV6learn</h1>
-        <p class="hero-lead">Naučte se zkrátit IPv6 adresu: nejdřív vynechte úvodní nuly, pak použijte <code>::</code>.</p>
-        <div class="hero-actions">
-          <button type="button" class="btn btn-primary" id="start-practice">Procvičování</button>
-          <button type="button" class="btn btn-ghost" id="start-test">Test — 10 příkladů</button>
+      <div class="hub">
+        <div class="hub-intro">
+          <p class="hero-kicker">PSI · IPv6</p>
+          <h1 class="hero-brand">IPV6learn</h1>
+          <p class="hero-lead">Výukový hub: zkracování, subnetting, speciální adresy a teorie — vyberte modul.</p>
         </div>
 
-        <figure class="example">
-          <figcaption>Příklad</figcaption>
-          <dl>
-            <div>
-              <dt>Preferovaný</dt>
-              <dd><code>fe80:0000:0000:0000:6678:9101:0000:34ab</code></dd>
-            </div>
-            <div>
-              <dt>Bez úvodních nul</dt>
-              <dd><code>fe80:0:0:0:6678:9101:0:34ab</code></dd>
-            </div>
-            <div>
-              <dt>Komprimovaný</dt>
-              <dd><code>fe80::6678:9101:0:34ab</code></dd>
-            </div>
-          </dl>
-        </figure>
-      </div>
+        <div class="hub-grid" role="navigation" aria-label="Moduly">
+          <button type="button" class="hub-card hub-card-short" data-go="practice">
+            <span class="hub-badge is-live">Dostupné</span>
+            <span class="hub-icon" aria-hidden="true">::</span>
+            <h2>Zkracování</h2>
+            <p>Vynechání úvodních nul a komprese <code>::</code> podle RFC 5952.</p>
+            <span class="hub-cta">Procvičovat →</span>
+          </button>
 
-      <div class="rules">
-        <h2>Pravidla</h2>
-        <ol>
-          <li><strong>Vynechat úvodní nuly</strong> v každém bloku (např. <code>00ab</code> → <code>ab</code>, <code>0000</code> → <code>0</code>).</li>
-          <li><strong>Komprese <code>::</code></strong> nahradí nejdelší souvislou řadu nulových bloků — pouze jednou.</li>
-          <li>Jeden samotný nulový blok se nekomprimuje. Písmena pište <strong>malými</strong>.</li>
-        </ol>
+          <button type="button" class="hub-card hub-card-test" data-go="test">
+            <span class="hub-badge is-live">Dostupné</span>
+            <span class="hub-icon" aria-hidden="true">10</span>
+            <h2>Test zkracování</h2>
+            <p>10 náhodných příkladů. Výsledek až na konci — bez nápovědy.</p>
+            <span class="hub-cta">Spustit test →</span>
+          </button>
+
+          <button type="button" class="hub-card hub-card-subnet" data-go="subnet">
+            <span class="hub-badge is-live">Základ</span>
+            <span class="hub-icon" aria-hidden="true">/64</span>
+            <h2>Subnetting</h2>
+            <p>Prefixy, 4. hextet a dělení sítí u IPv6 — přehled a příklady.</p>
+            <span class="hub-cta">Otevřít →</span>
+          </button>
+
+          <button type="button" class="hub-card hub-card-special" data-go="special">
+            <span class="hub-badge is-live">Dostupné</span>
+            <span class="hub-icon" aria-hidden="true">fe80</span>
+            <h2>Speciální adresy</h2>
+            <p>Loopback, unspecified, link-local, global unicast, 2001:db8::/32.</p>
+            <span class="hub-cta">Prohlédnout →</span>
+          </button>
+
+          <button type="button" class="hub-card hub-card-learn" data-go="learn">
+            <span class="hub-badge is-live">Dostupné</span>
+            <span class="hub-icon" aria-hidden="true">ABC</span>
+            <h2>Teorie IPv6</h2>
+            <p>Celý učební materiál ze základů PSI — historie, zápis, proč IPv6.</p>
+            <span class="hub-cta">Číst →</span>
+          </button>
+
+          <div class="hub-card hub-card-soon" aria-disabled="true">
+            <span class="hub-badge">Připravujeme</span>
+            <span class="hub-icon" aria-hidden="true">SLAAC</span>
+            <h2>SLAAC &amp; DHCPv6</h2>
+            <p>Jak zařízení získá adresu — auto-konfigurace a dynamické přidělení.</p>
+            <span class="hub-cta">Brzy</span>
+          </div>
+        </div>
+
+        <div class="hub-foot">
+          <p>Tip: začněte <strong>Teorií</strong>, pak <strong>Zkracováním</strong> a nakonec <strong>Testem</strong>.</p>
+        </div>
       </div>
     </section>
 
+    <section id="view-learn" class="view">
+      <div class="module-bar">
+        <button type="button" class="btn btn-ghost btn-sm" data-back-home>← Menu</button>
+        <span class="module-bar-title">Teorie</span>
+        <button type="button" class="btn btn-primary btn-sm" id="learn-to-practice">Procvičit zkracování</button>
+      </div>
+      <div class="panel-head">
+        <div>
+          <h2>Teorie IPv6</h2>
+          <p class="panel-sub">Základy PSI — historie, zápis adres, zkracování a speciální prefixy.</p>
+        </div>
+      </div>
+
+      <article class="learn">
+        <nav class="learn-toc" aria-label="Obsah">
+          <a href="#l-co">Co je IP</a>
+          <a href="#l-proc">Proč IPv6</a>
+          <a href="#l-zapis">Zápis adresy</a>
+          <a href="#l-zkrac">Zkracování</a>
+          <a href="#l-spec">Speciální adresy</a>
+          <a href="#l-pridel">Přidělování</a>
+        </nav>
+
+        <section class="learn-block" id="l-co">
+          <h3>Internet protokol a sítě</h3>
+          <ul class="learn-list">
+            <li><strong>Internet</strong> (s velkým I) — globální veřejná síť sítí.</li>
+            <li><strong>internet</strong> (s malým i) — obecně propojení více sítí.</li>
+            <li><strong>IPv6</strong> = Internet Protocol version 6 — aktuální „velká“ verze adresování na síťové vrstvě.</li>
+          </ul>
+          <div class="learn-cards">
+            <div class="learn-card">
+              <h4>IPv4</h4>
+              <p>Standardizován hlavně v <strong>RFC 791 (1981)</strong>. Práce na něm začala koncem 70. let.</p>
+              <p><code>2<sup>32</sup></code> ≈ <strong>4,3 miliardy</strong> adres (ne přesně 4,5).</p>
+            </div>
+            <div class="learn-card">
+              <h4>IPv6</h4>
+              <p>Návrh v 90. letech (drafty kolem 1995–96), klíčová specifikace např. <strong>RFC 2460 (1998)</strong>, dnes <strong>RFC 8200</strong>.</p>
+              <p><code>2<sup>128</sup></code> adres — obrovský adresní prostor.</p>
+            </div>
+          </div>
+          <p class="learn-note">V 80. letech byly PC doma vzácné; sítě hlavně ve firmách. Provoz byl převážně <em>data</em> (e-mail, text). Dnes dominuje <em>video</em>, plus hlas a data — IPv6 počítalo s větším a rozmanitějším provozem.</p>
+        </section>
+
+        <section class="learn-block" id="l-proc">
+          <h3>Proč vzniklo IPv6</h3>
+          <ol>
+            <li><strong>Nedostatek IPv4 adres</strong> — prostor ~4,3 mld. nestačí pro všechny zařízení a služby.</li>
+            <li><strong>Jednodušší a čistší návrh</strong> — větší adresy, lepší podpora auto-konfigurace, IPsec jako součást ekosystému.</li>
+            <li><strong>Růst sítí a typů provozu</strong> — nejen textové zprávy, ale video, hlas, IoT, mobilní sítě.</li>
+          </ol>
+        </section>
+
+        <section class="learn-block" id="l-zapis">
+          <h3>Jak se adresa zapisuje</h3>
+          <div class="learn-compare">
+            <div>
+              <h4>IPv4</h4>
+              <ul>
+                <li>Binárně (0/1), v praxi <strong>desítkově</strong> (0–255).</li>
+                <li><strong>4 oktety</strong> oddělené tečkou.</li>
+                <li>Příklad: <code>128.164.22.47</code></li>
+              </ul>
+            </div>
+            <div>
+              <h4>IPv6</h4>
+              <ul>
+                <li>Binárně uvnitř, zápis <strong>hexadecimálně</strong> (0–9, a–f).</li>
+                <li><strong>8 hextetů</strong> (po 16 bitech) oddělených dvojtečkou.</li>
+                <li>Příklad: <code>2001:0db8:7654:3210:fedc:ba98:7654:3210</code></li>
+              </ul>
+            </div>
+          </div>
+          <p><strong>Hextet</strong> = 16 bitů = 4 hexadecimální číslice. Jedna hex číslice = 4 bity.</p>
+          <h4>Subnetting / VLSM</h4>
+          <p>U IPv6 je adresní prostor velký, proto je plánování prefixů často přehlednější než u IPv4. Typická délka sítě pro koncové hostitele je <code>/64</code>. Ve výuce se často ukazuje, že se „subnetuje“ mimo jiné ve <strong>4. hextetu</strong> (u schémat typu ISP <code>/48</code> → sítě <code>/64</code>).</p>
+        </section>
+
+        <section class="learn-block" id="l-zkrac">
+          <h3>Zkracování IPv6</h3>
+          <p>Plný zápis je dlouhý, proto se zkracuje (RFC 5952):</p>
+          <ol>
+            <li><strong>Vynechat úvodní nuly</strong> v každém hextetu: <code>0000</code> → <code>0</code>, <code>0db8</code> → <code>db8</code>.</li>
+            <li><strong>Jednou</strong> nahradit nejdelší souvislou řadu nulových hextetů znakem <code>::</code> (při shodě délky bere se levá).</li>
+            <li>Jeden samotný nulový hextet se <strong>nekomprimuje</strong> pomocí <code>::</code>.</li>
+          </ol>
+          <p>Příklad: <code>0000:1111:0000:2222</code> → nejdřív <code>0:1111:0:2222</code> (a dál podle zbytku adresy).</p>
+          <div class="learn-callout is-warn">
+            <strong>Důležité:</strong> <code>::</code> smí být v adrese <em>jen jednou</em>. Zápis typu <code>1222::2222::…</code> je neplatný — není jasné, kolik nul patří kam.
+          </div>
+          <p><a href="#" id="learn-jump-practice" class="learn-link">Přejít na procvičování zkracování →</a></p>
+        </section>
+
+        <section class="learn-block" id="l-spec">
+          <h3>Speciální IPv6 adresy</h3>
+          <div class="learn-table-wrap">
+            <table class="learn-table">
+              <thead>
+                <tr>
+                  <th>Adresa / prefix</th>
+                  <th>Význam</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>::1/128</code></td>
+                  <td><strong>Loopback</strong> — localhost (jako 127.0.0.1 u IPv4).</td>
+                </tr>
+                <tr>
+                  <td><code>::/128</code></td>
+                  <td><strong>Unspecified</strong> — neurčená adresa (zařízení ještě nemá adresu).</td>
+                </tr>
+                <tr>
+                  <td><code>fe80::/10</code></td>
+                  <td><strong>Link-local</strong> — jen na lokálním spoji (ND, automatická konfigurace). V praxi formát <code>fe80::/64</code> (RFC 4291).</td>
+                </tr>
+                <tr>
+                  <td><code>2000::/3</code></td>
+                  <td><strong>Global unicast</strong> — veřejně směrovatelné adresy (rozsah začínající 2000–3fff…).</td>
+                </tr>
+                <tr>
+                  <td><code>2001:db8::/32</code></td>
+                  <td><strong>Dokumentační / výukový</strong> prefix (RFC 3849) — do příkladů a učebnic, ne do ostrého internetu.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="learn-block" id="l-pridel">
+          <h3>Jak zařízení získá adresu</h3>
+          <div class="learn-cards">
+            <div class="learn-card">
+              <h4>IPv4</h4>
+              <ul>
+                <li><strong>Staticky</strong> — správce nastaví ručně.</li>
+                <li><strong>DHCP</strong> — server přidělí dynamicky.</li>
+              </ul>
+            </div>
+            <div class="learn-card">
+              <h4>IPv6 — 3 běžné způsoby</h4>
+              <ul>
+                <li><strong>Staticky</strong> — ruční konfigurace.</li>
+                <li><strong>SLAAC</strong> — bezstavová auto-konfigurace (Router Advertisement + interface ID).</li>
+                <li><strong>DHCPv6</strong> — stavové přidělení ze serveru (případně i DNS info).</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <p class="learn-sources">
+          Zdroje: <a href="https://www.rfc-editor.org/rfc/rfc4291" target="_blank" rel="noopener">RFC 4291</a>,
+          <a href="https://www.rfc-editor.org/rfc/rfc5952" target="_blank" rel="noopener">RFC 5952</a>,
+          <a href="https://www.rfc-editor.org/rfc/rfc3849" target="_blank" rel="noopener">RFC 3849</a>,
+          <a href="https://www.rfc-editor.org/rfc/rfc791" target="_blank" rel="noopener">RFC 791</a>.
+        </p>
+      </article>
+    </section>
+
+    <section id="view-subnet" class="view">
+      <div class="module-bar">
+        <button type="button" class="btn btn-ghost btn-sm" data-back-home>← Menu</button>
+        <span class="module-bar-title">Subnetting</span>
+        <button type="button" class="btn btn-ghost btn-sm" id="subnet-to-learn">Teorie</button>
+      </div>
+      <div class="panel-head">
+        <div>
+          <h2>Subnetting IPv6</h2>
+          <p class="panel-sub">Jak se dělí adresní prostor — prefixy, /64 a role 4. hextetu.</p>
+        </div>
+      </div>
+
+      <article class="learn">
+        <section class="learn-block">
+          <h3>Základní myšlenka</h3>
+          <p>IPv6 má obrovský prostor, proto je plánování sítí často přehlednější než u IPv4 (VLSM). Koncovým sítím se typicky dává prefix <code>/64</code> (64 bitů síť + 64 bitů interface ID).</p>
+          <div class="learn-cards">
+            <div class="learn-card">
+              <h4>Časté prefixy</h4>
+              <ul>
+                <li><code>/48</code> — organizace / customer (16 bitů na podsítě)</li>
+                <li><code>/56</code> — menší blok (8 bitů na podsítě)</li>
+                <li><code>/64</code> — jedna LAN / VLAN</li>
+              </ul>
+            </div>
+            <div class="learn-card">
+              <h4>4. hextet</h4>
+              <p>U schématu <code>/48</code> → <code>/64</code> leží identifikátor podsítě právě ve <strong>4. hextetu</strong> (bity 49–64).</p>
+              <p>Příklad: <code>2001:db8:abcd:<strong>0007</strong>::/64</code></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="learn-block">
+          <h3>Příklad dělení</h3>
+          <p>Prefix organizace: <code>2001:db8:a1b2::/48</code></p>
+          <div class="learn-table-wrap">
+            <table class="learn-table">
+              <thead>
+                <tr><th>Podsíť</th><th>4. hextet</th><th>Prefix</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>VLAN 1</td><td><code>0001</code></td><td><code>2001:db8:a1b2:1::/64</code></td></tr>
+                <tr><td>VLAN 2</td><td><code>0002</code></td><td><code>2001:db8:a1b2:2::/64</code></td></tr>
+                <tr><td>VLAN 10</td><td><code>000a</code></td><td><code>2001:db8:a1b2:a::/64</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="learn-callout">
+            Hostitelům necháváme typicky <code>/64</code>; identifikátor podsítě se často čísluje ve 4. hextetu.
+          </div>
+        </section>
+
+        <div class="hero-actions">
+          <button type="button" class="btn btn-primary" data-back-home>Zpět do menu</button>
+          <button type="button" class="btn btn-ghost" id="subnet-to-practice">Zkracování</button>
+        </div>
+      </article>
+    </section>
+
     <section id="view-practice" class="view">
+      <div class="module-bar">
+        <button type="button" class="btn btn-ghost btn-sm" data-back-home>← Menu</button>
+        <span class="module-bar-title">Zkracování · Procvičování</span>
+        <button type="button" class="btn btn-ghost btn-sm" id="practice-open-test">Test (10)</button>
+      </div>
       <div class="panel-head">
         <div>
           <h2>Procvičování</h2>
@@ -76,6 +345,14 @@
         Písmena pište malými. Další příklad načtete tlačítkem Další.
       </div>
 
+      <div class="steps steps-compact" aria-hidden="true">
+        <article class="step step-a"><span class="step-num">1</span><h3>Preferovaný</h3></article>
+        <div class="step-join"></div>
+        <article class="step step-b"><span class="step-num">2</span><h3>Bez nul</h3></article>
+        <div class="step-join"></div>
+        <article class="step step-c"><span class="step-num">3</span><h3>Komprese</h3></article>
+      </div>
+
       <div class="addr-board" id="practice-board"></div>
       <div class="feedback" id="practice-feedback" hidden></div>
 
@@ -88,6 +365,10 @@
     </section>
 
     <section id="view-test" class="view">
+      <div class="module-bar">
+        <button type="button" class="btn btn-ghost btn-sm" data-back-home>← Menu</button>
+        <span class="module-bar-title">Zkracování · Test</span>
+      </div>
       <div class="panel-head">
         <div>
           <h2>Test</h2>
@@ -110,6 +391,10 @@
     </section>
 
     <section id="view-results" class="view">
+      <div class="module-bar">
+        <button type="button" class="btn btn-ghost btn-sm" data-back-home>← Menu</button>
+        <span class="module-bar-title">Zkracování · Výsledek</span>
+      </div>
       <div class="results-card">
         <p class="results-label">Výsledek testu</p>
         <p class="results-score" id="results-score">0 / 10</p>

@@ -2,6 +2,33 @@
  * IPV6learn — procvičování a test zkracování IPv6 (RFC 5952)
  */
 
+/* —— Theme —— */
+(function initTheme() {
+  const root = document.documentElement;
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+
+  function current() {
+    return root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  }
+
+  function apply(theme) {
+    root.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("ipv6learn-theme", theme);
+    } catch (_) {
+      /* ignore */
+    }
+    btn.setAttribute("aria-label", theme === "dark" ? "Zapnout světlý režim" : "Zapnout tmavý režim");
+  }
+
+  btn.addEventListener("click", () => {
+    apply(current() === "dark" ? "light" : "dark");
+  });
+
+  apply(current());
+})();
+
 const HEX = "0123456789abcdef";
 const TEST_SIZE = 10;
 
@@ -329,9 +356,20 @@ function makeLabel(html) {
 
 const views = {
   home: document.getElementById("view-home"),
+  learn: document.getElementById("view-learn"),
+  subnet: document.getElementById("view-subnet"),
   practice: document.getElementById("view-practice"),
   test: document.getElementById("view-test"),
   results: document.getElementById("view-results"),
+};
+
+const CRUMBS = {
+  home: "",
+  learn: "Teorie",
+  subnet: "Subnetting",
+  practice: "Zkracování",
+  test: "Test zkracování",
+  results: "Výsledek testu",
 };
 
 let practiceBoard = null;
@@ -347,16 +385,70 @@ let testActive = false;
 
 function showView(name) {
   Object.entries(views).forEach(([key, el]) => {
-    el.classList.toggle("is-visible", key === name);
+    if (el) el.classList.toggle("is-visible", key === name);
   });
-  document.querySelectorAll(".mode-btn").forEach((btn) => {
-    const mode = btn.dataset.mode;
-    const active =
-      (mode === "practice" && (name === "practice" || name === "home")) ||
-      (mode === "test" && (name === "test" || name === "results"));
-    btn.classList.toggle("is-active", active);
-    btn.setAttribute("aria-selected", active ? "true" : "false");
-  });
+  const crumb = document.getElementById("header-crumb");
+  if (crumb) {
+    const label = CRUMBS[name] || "";
+    crumb.hidden = !label;
+    crumb.textContent = label;
+  }
+  if (name === "learn" || name === "subnet" || name === "home") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+function goHome() {
+  if (testActive && !confirm("Opustit test a vrátit se do menu?")) return;
+  testActive = false;
+  showView("home");
+}
+
+function openPractice() {
+  if (testActive) {
+    const leave = confirm("Opustit test a přejít na procvičování?");
+    if (!leave) return;
+    testActive = false;
+  }
+  showView("practice");
+  if (!practiceBoard) loadPractice(false);
+}
+
+function openLearn(anchor) {
+  if (testActive) {
+    const leave = confirm("Opustit test a otevřít teorii?");
+    if (!leave) return;
+    testActive = false;
+  }
+  showView("learn");
+  if (anchor) {
+    requestAnimationFrame(() => {
+      const el = document.getElementById(anchor);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+}
+
+function openSubnet() {
+  if (testActive) {
+    const leave = confirm("Opustit test a otevřít subnetting?");
+    if (!leave) return;
+    testActive = false;
+  }
+  showView("subnet");
+}
+
+function requestTest() {
+  if (testActive) {
+    const restart = confirm("Probíhá test. Chcete začít znovu od začátku?");
+    if (!restart) {
+      showView("test");
+      return;
+    }
+  } else if (!confirm("Spustit nový test s 10 příklady?")) {
+    return;
+  }
+  startTest();
 }
 
 function updatePracticeStat() {
@@ -838,48 +930,37 @@ function finishTest() {
 
 /* ========== Navigace ========== */
 
-document.querySelectorAll(".mode-btn").forEach((btn) => {
+document.querySelectorAll("[data-go]").forEach((btn) => {
   btn.addEventListener("click", () => {
-    if (btn.dataset.mode === "practice") {
-      if (testActive) {
-        const leave = confirm("Opustit test? Neuložené odpovědi zůstanou v paměti jen do obnovení stránky.");
-        if (!leave) return;
-        testActive = false;
-      }
-      showView("practice");
-      if (!practiceBoard) loadPractice(false);
-    } else {
-      if (testActive) {
-        const restart = confirm("Probíhá test. Chcete začít znovu od začátku?");
-        if (!restart) {
-          showView("test");
-          return;
-        }
-      } else if (!confirm("Spustit nový test s 10 příklady?")) {
-        return;
-      }
-      startTest();
-    }
+    const go = btn.dataset.go;
+    if (go === "practice") openPractice();
+    else if (go === "test") requestTest();
+    else if (go === "learn") openLearn();
+    else if (go === "special") openLearn("l-spec");
+    else if (go === "subnet") openSubnet();
   });
 });
 
-document.getElementById("start-practice").addEventListener("click", () => {
-  showView("practice");
-  loadPractice(false);
+document.querySelectorAll("[data-back-home]").forEach((btn) => {
+  btn.addEventListener("click", () => goHome());
 });
 
-document.getElementById("start-test").addEventListener("click", () => startTest());
+document.getElementById("learn-to-practice").addEventListener("click", () => openPractice());
+
+document.getElementById("learn-jump-practice").addEventListener("click", (e) => {
+  e.preventDefault();
+  openPractice();
+});
+
+document.getElementById("subnet-to-practice").addEventListener("click", () => openPractice());
+document.getElementById("subnet-to-learn").addEventListener("click", () => openLearn());
+
+document.getElementById("practice-open-test").addEventListener("click", () => requestTest());
+
 document.getElementById("retry-test").addEventListener("click", () => startTest());
-document.getElementById("back-practice").addEventListener("click", () => {
-  showView("practice");
-  if (!practiceBoard) loadPractice(false);
-});
+document.getElementById("back-practice").addEventListener("click", () => openPractice());
 
-document.getElementById("brand-home").addEventListener("click", () => {
-  if (testActive && !confirm("Opustit test a vrátit se na úvod?")) return;
-  testActive = false;
-  showView("home");
-});
+document.getElementById("brand-home").addEventListener("click", () => goHome());
 
 document.getElementById("practice-board").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && e.target.classList.contains("compress-input")) {
@@ -908,4 +989,5 @@ window.IPV6learn = {
   checkOmit,
   checkCompressed,
   gradeItem,
+  showView,
 };
