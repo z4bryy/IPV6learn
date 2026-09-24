@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPV6learn — Procvičování a Test</title>
+  <meta name="description" content="IPV6learn — procvičování a test zkracování IPv6 adres" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <button type="button" class="brand" id="brand-home" aria-label="Domů — IPV6learn">
+      <span class="brand-mark" aria-hidden="true">::</span>
+      <span class="brand-name">IPV6learn</span>
+    </button>
+    <nav class="mode-nav" role="tablist" aria-label="Režim">
+      <button type="button" class="mode-btn is-active" data-mode="practice" role="tab" aria-selected="true">Procvičování</button>
+      <button type="button" class="mode-btn" data-mode="test" role="tab" aria-selected="false">Test (10)</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-home" class="view is-visible">
+      <div class="hero">
+        <h1 class="hero-brand">IPV6learn</h1>
+        <p class="hero-lead">Naučte se zkrátit IPv6 adresu: nejdřív vynechte úvodní nuly, pak použijte <code>::</code>.</p>
+        <div class="hero-actions">
+          <button type="button" class="btn btn-primary" id="start-practice">Procvičování</button>
+          <button type="button" class="btn btn-ghost" id="start-test">Test — 10 příkladů</button>
+        </div>
+
+        <figure class="example">
+          <figcaption>Příklad</figcaption>
+          <dl>
+            <div>
+              <dt>Preferovaný</dt>
+              <dd><code>fe80:0000:0000:0000:6678:9101:0000:34ab</code></dd>
+            </div>
+            <div>
+              <dt>Bez úvodních nul</dt>
+              <dd><code>fe80:0:0:0:6678:9101:0:34ab</code></dd>
+            </div>
+            <div>
+              <dt>Komprimovaný</dt>
+              <dd><code>fe80::6678:9101:0:34ab</code></dd>
+            </div>
+          </dl>
+        </figure>
+      </div>
+
+      <div class="rules">
+        <h2>Pravidla</h2>
+        <ol>
+          <li><strong>Vynechat úvodní nuly</strong> v každém bloku (např. <code>00ab</code> → <code>ab</code>, <code>0000</code> → <code>0</code>).</li>
+          <li><strong>Komprese <code>::</code></strong> nahradí nejdelší souvislou řadu nulových bloků — pouze jednou.</li>
+          <li>Jeden samotný nulový blok se nekomprimuje. Písmena pište <strong>malými</strong>.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="view-practice" class="view">
+      <div class="panel-head">
+        <div>
+          <h2>Procvičování</h2>
+          <p class="panel-sub">Převeďte adresu do zkráceného a komprimovaného tvaru. Poté klikněte na Kontrolovat.</p>
+        </div>
+        <p class="stat" id="practice-stat">Úspěšně: <span>0</span></p>
+      </div>
+
+      <div class="instructions">
+        <strong>Pokyny:</strong>
+        Převeďte IPv6 adresy do zkrácené (vynechat úvodní nuly) a komprimované podoby.
+        Písmena pište malými. Další příklad načtete tlačítkem Další.
+      </div>
+
+      <div class="addr-board" id="practice-board"></div>
+      <div class="feedback" id="practice-feedback" hidden></div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="practice-check">Kontrolovat</button>
+        <button type="button" class="btn btn-secondary" id="practice-next">Další</button>
+        <button type="button" class="btn btn-secondary" id="practice-show">Ukázat</button>
+        <button type="button" class="btn btn-ghost" id="practice-reset">Reset</button>
+      </div>
+    </section>
+
+    <section id="view-test" class="view">
+      <div class="panel-head">
+        <div>
+          <h2>Test</h2>
+          <p class="panel-sub">10 náhodných příkladů. Správnost uvidíte až na konci.</p>
+        </div>
+        <p class="stat" id="test-progress">Příklad <span>1</span> / 10</p>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="test-progress-fill"></div>
+      </div>
+
+      <div class="test-dots" id="test-dots" role="navigation" aria-label="Přehled příkladů"></div>
+      <div class="addr-board" id="test-board"></div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="test-prev" disabled>Zpět</button>
+        <button type="button" class="btn btn-primary" id="test-next">Další příklad</button>
+      </div>
+    </section>
+
+    <section id="view-results" class="view">
+      <div class="results-card">
+        <p class="results-label">Výsledek testu</p>
+        <p class="results-score" id="results-score">0 / 10</p>
+        <p class="results-pct" id="results-pct">0 %</p>
+        <p class="results-breakdown" id="results-breakdown"></p>
+        <p class="results-msg" id="results-msg"></p>
+        <div class="results-list" id="results-list"></div>
+        <div class="hero-actions results-actions">
+          <button type="button" class="btn btn-primary" id="retry-test">Zkusit znovu</button>
+          <button type="button" class="btn btn-ghost" id="back-practice">Zpět k procvičování</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>IPV6learn · RFC 5952</p>
+    <p class="footer-credit">made by <a href="https://ozdigitals.com" target="_blank" rel="noopener noreferrer">ozdigitals.com</a></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
